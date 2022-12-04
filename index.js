@@ -26,7 +26,7 @@ class Sprite {
         }
         this.color = color
         this.isAttacking
-
+        this.health=100
     }
 
     draw(){
@@ -117,7 +117,40 @@ const keys = {
         pressed : false
     }
 }
+let timer=60
+let timerId;
+function decreaseTimer() {
+    if (timer>0)
+    {
+       timerId=setTimeout(decreaseTimer,1000)
+        timer--;
+        document.querySelector('#timer').innerHTML=timer
+    }
+    if (timer===0){
+        determinerWinner({player,enemy,timerId})
+    }
 
+}
+
+function determinerWinner({player,enemy,timerId})
+{
+    clearTimeout(timerId)
+    document.querySelector('#displayText').style.display='flex';
+    if (player.health === enemy.health)
+    {
+        document.querySelector('#displayText').innerHTML='Tie';
+    }
+    else if (player.health > enemy.health)
+    {
+        document.querySelector('#displayText').innerHTML='Player 1 Win';
+    }
+    else if (player.health < enemy.health)
+    {
+        document.querySelector('#displayText').innerHTML='Player 2 Win';
+    }
+}
+
+decreaseTimer()
 
 function animate(){
     window.requestAnimationFrame(animate)
@@ -156,7 +189,8 @@ function animate(){
      )
     {
         player.isAttacking = false
-        console.log('go');
+        enemy.health -=20
+        document.querySelector('#enemyHealth').style.width=enemy.health + '%' ;
     }
 
     if (
@@ -168,7 +202,14 @@ function animate(){
     )
     {
         enemy.isAttacking = false
-        console.log('enemy attack successful');
+        player.health -= 20
+        document.querySelector('#playerHealth').style.width=player.health + '%' ;
+    }
+
+    // end game based on health
+    if (enemy.health <=0 || player.health<=0)
+    {
+        determinerWinner({player,enemy,timerId})
     }
 
 }
@@ -240,8 +281,6 @@ window.addEventListener('keyup',(event)=>{
         case 'ArrowLeft':
             keys.ArrowLeft.pressed = false
             break;
-
     }
-
     console.log(event.key);
 });
